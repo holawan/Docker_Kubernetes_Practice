@@ -17,13 +17,13 @@
 
 1. 최신 패키지 리스트 업데이트
 
-    ```
+    ```bash
     sudo apt update
     ```
 
 2. docker 다운로드를 위해 필요한 https 관련 패키지 설치
 
-    ```
+    ```bash
     sudo apt install apt-transport-https ca-certificates curl software-properties-common
     ```
 
@@ -31,7 +31,7 @@
 
 3. docker repository 접근을 위한 GPG key 설정
 
-    ```
+    ```bash
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     ```
 
@@ -39,7 +39,7 @@
 
 4. docker repository 등록
 
-    ```
+    ```bash
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
     ```
 
@@ -47,19 +47,19 @@
 
 5. 등록한 docker repository 까지 포함하여 최신 패키지 리스트 업데이트
 
-    ```
+    ```bash
     sudo apt update
     ```
 
 6. docker 설치
 
-    ```
+    ```bash
     sudo apt install docker-ce
     ```
 
 7. docker 실행 중임을 확인
 
-    ```
+    ```bash
     sudo systemctl status docker
     ```
 
@@ -67,7 +67,7 @@
 
 1. 현 사용자 (ubuntu) ID를 docker group에 포함
 
-    ```
+    ```bash
     sudo usermod -aG docker ${USER}
     ```
 
@@ -75,7 +75,7 @@
 
 3. 현 ID가 docker group에 포함되어 있는지 확인 ( docker가 리스트에 나오면됨 )
 
-    ```
+    ```bash
     id -nG
     ```
 
@@ -91,19 +91,19 @@
 
     ![image-20220827183857625](04_Docker 설치.assets/image-20220827183857625.png)
 
-    ```
+    ```bash
     sudo curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     ```
 
 2. 실행 권한 주기
 
-    ```
+    ```bash
     sudo chmod +x /usr/local/bin/docker-compose
     ```
 
 3. 다음 명령 실행시 버전 확인 가능하면 성공
 
-    ```
+    ```bash
     docker-compose --version
     ```
 

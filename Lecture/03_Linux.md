@@ -40,7 +40,7 @@
 
 #### 로그인
 
-```
+```bash
 ssh -i docker.pem ubuntu@3.34.156.196
 ```
 
@@ -49,7 +49,7 @@ ssh -i docker.pem ubuntu@3.34.156.196
 
 #### whoami : 로그인한 사용자 ID
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ whoami
 ubuntu
 ```
@@ -83,7 +83,7 @@ ubuntu
 
 #### pwd : 현재 디렉토리 위치
 
- ```
+ ```bash
  ubuntu@ip-172-31-42-165:~$ pwd
  /home/ubuntu
  ubuntu@ip-172-31-42-165:~$ cd ..
@@ -93,7 +93,7 @@ ubuntu
 
 #### ls : 파일 목록 출력 
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ ls
 
 ubuntu@ip-172-31-42-165:~$ ls -a 
@@ -181,14 +181,14 @@ drwx------ 2 ubuntu ubuntu 4096 Aug 25 09:47 .ssh
 
 ​		합 : 4 
 
-```
+```bash
 rwxrwxrwx = 777
 r-xr-xr-x = 555
 r-------- = 400
 rwx------ = 700
 ```
 
-```
+```bash
 chmod 400 my-key-pair.pem
 ```
 
@@ -197,7 +197,7 @@ chmod 400 my-key-pair.pem
 
 #### cat : 파일 보기
 
-```
+```bash
 cat nginx.conf
 # ngin.conf 파일 내용이 모두 출력됨 
 ```
@@ -208,7 +208,7 @@ cat nginx.conf
 - r 옵션 : 하위 디렉토리를 포함한 모든 파일 삭제
 - f 옵션 : 강제로 파일이나 디렉토리 삭제
 
-```
+```bash
 rm -r test/
 ```
 
@@ -261,7 +261,7 @@ rm -r test/
     - grep files.txt는 grep 명령의 입력 스트림을 검색해서 files.txt가 들어가 있는 입력 내용만 출력함
     - 따라서, ls 명령으로 해당 디렉토리/파일 중에 files.txt 파일이 있는지 출력해줌
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ ls -al | grep bash
 -rw------- 1 ubuntu ubuntu  569 Aug 25 19:38 .bash_history
 -rw-r--r-- 1 ubuntu ubuntu  220 Feb 25  2020 .bash_logout
@@ -319,7 +319,7 @@ ubuntu@ip-172-31-42-165:~$ ls -al | grep bash
     - 쉘(shell)에서 해당 프로세스 실행 시, 맨 뒤에는 &를 붙여줌
     - 터미널이 하나일지라도 여러가지 명령을 실행할 수 있다. 
 
-    ```
+    ```bash
     find / -name '*.py' > list.txt &
     [1] 57
     ```
@@ -367,7 +367,7 @@ ubuntu@ip-172-31-42-165:~$ ls -al | grep bash
     - kill 프로세스 ID (pid)
     - 작업 강제종료 옵션 -9 
 
-    ```
+    ```bash
     find / -name '*.py' > list.txt& 
     [1] 57
     kill -9 57
@@ -390,7 +390,7 @@ ubuntu@ip-172-31-42-165:~$ ls -al | grep bash
     - 1MB 사이즈를 가지고 있는 A파일을 B파일로 복사
         - cp A B -> A와 B는 각각 물리적으로 10MB 파일로 저장
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ lslist.txt
 ubuntu@ip-172-31-42-165:~$ cp list.txt a.txt
 ubuntu@ip-172-31-42-165:~$ lsa.txt  list.txt
@@ -416,7 +416,7 @@ ubuntu@ip-172-31-42-165:~$ lsa.txt  list.txt
     - Windows OS의 바로가기와 동일
     - ls -al 하면 소프트링크 확인 가능
 
-    ```
+    ```bash
     lrwxr-xr-x link3.txt -> link2.txt
     ```
 
@@ -454,7 +454,7 @@ ubuntu@ip-172-31-42-165:~$ lsa.txt  list.txt
     - 우리는 ubuntu를 처음 받을 때 update를 먼저 할 필요가 있다. 
     - sudo : 관리자 권한으로 실행 
 
-```
+```bash
 sudo apt-get update
 ```
 
@@ -462,25 +462,25 @@ sudo apt-get update
     - 시스템 자체가 망가질 우려가 있다.
     - 시스템은 모두가 잘 맞아야 돌아가는데 upgrade는 인덱스 기반 정보로 현재 linux에 있는 모든 프로그램을 최신버전으로 upgrate하는 것이기 때문에 상호작용이 잘 되지 않을 수 있다.
 
-```
+```bash
 sudo apt-get upgrade
 ```
 
 - 패키지 설치
 
-    ```
+    ```bash
     sudo apt-get install 패키지명
     ```
 
 - 패키지 삭제(설정파일 제외)
 
-```
+```bash
 sudo apt-get remove 패키지명
 ```
 
 - 패키지 삭제(설정파일 포함)
 
-```
+```bash
 sudo apt-get --purge remove 패키지명
 ```
 
@@ -508,19 +508,19 @@ sudo apt-get --purge remove 패키지명
 
 - 입력
 
-    ```
+    ```bash
     i 포커스가 잡힌 커서 위치에서 편집모드 시작
     ```
 
 - 삭제(일반 모드에서 실행해야함)
 
-    ```
+    ```bash
     x 커서의 한 문자를 삭제
     ```
 
 - 파일 저장
 
-    ```
+    ```bash
     :w 현재 오픈된 파일 저장
     :q 저장하지 않고 종료 (quit)
     :wq 현재 오픈된 파일 저장 후 종료
@@ -528,3 +528,4 @@ sudo apt-get --purge remove 패키지명
     ```
 
     
+

@@ -65,7 +65,7 @@
     3. 다운로드 받은 image로 docker container 생성 및 실행
 - 모든 docker 명령은 CLI (Command Line Interface)로 키보드로 직접 명령을 작성하는 형태로 수행하며, 명령 형식은 크게 다음과 같은 형태임
 
-```
+```bash
 docker 명령 옵션 선택자(이미지ID/컨테이너 등)
 ```
 
@@ -74,7 +74,7 @@ docker 명령 옵션 선택자(이미지ID/컨테이너 등)
 - 다음과 같이 image를 다루는지, container를 다루는지를 명시적으로 이해하기 위해, docker 다음에 image 또는 container를 기재해줌
     - 명령은 어차피 다르므로, 굳이 image 또는 container를 붙이지 않아도 되지만, 최근에는 해당 키워드를 붙이는 경향이 있음
 
-```
+```bash
 docker image 명령 옵션 ...
 docker container 명령 옵션 ...
 ```
@@ -96,19 +96,19 @@ docker container 명령 옵션 ...
         - 맥/윈도우의 각 docker for mac, docker for windows에서는 로그인 할 수 있는 별도 UI 제공
     - docker hub에 로그인할 수 있는 command line도 제공됨
 
-    ```
+    ```bash
     docker login # 다음 ㅁ여령 후, Username과 Password 입력 
     ```
 
     - docekr hub 로그아웃
 
-    ```
+    ```bash
     docker logout
     ```
 
 #### 2. 다운로드 받을 이미지 검색
 
-```
+```bash
 docker search ubuntu
 docker search --limit=5 ubuntu
 ```
@@ -119,7 +119,7 @@ docker search --limit=5 ubuntu
 
 - ubuntu로 검색하면 다양한 이미지 리스트가 생성됨
 
-    ```
+    ```bash
     ubuntu@ip-172-31-42-165:~$ docker search ubuntu
     NAME                             DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED                                                                                 IAL   AUTOMATED
     ubuntu                           Ubuntu is a Debian-based Linux operating sys…   14846     [OK] 
@@ -141,13 +141,13 @@ docker search --limit=5 ubuntu
 
 - 태그를 안붙이면, default로 latest를 다운로드 받을 수 있음
 
-    ```
+    ```bash
     docker pull ubuntu
     ```
 
 - 다음과 같이 특정 태그를 사용하면 해당 버전 다운로드
 
-    ```
+    ```bash
     docker pull ubuntu:20.10
     ```
 
@@ -159,7 +159,7 @@ docker search --limit=5 ubuntu
     - 이와 같이 대부분의 프레임워크나 기능들은 동일한 기능을 하는 다양한 명령어가 존재하는 경우가 많으며, 이 중에서는 손에 익는 것 사용하자
 - docker images 명령 
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ docker pull ubuntu:20.04
 20.04: Pulling from library/ubuntu
 3b65ec22a9e9: Pull complete
@@ -180,13 +180,13 @@ ubuntu@ip-172-31-42-165:~$ docker images -q
 
 - docker rmi 명령과 docker image rm 명령으로 동일한 기능을 수행할 수 있음 
 
-```
+```bash
 docker rmi 이미지ID (또는 이미지 REPOSITORY 이름)
 
 docker image rm 이미지ID(또는 이미지 REPOSITORY 이름)
 ```
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ docker image rm ubuntu:20.04
 Untagged: ubuntu:20.04
 Untagged: ubuntu@sha256:af5efa9c28de78b754777af9b4d850112cad01899a5d37d2617bb94dc63a49aa        
@@ -208,7 +208,7 @@ Deleted: sha256:c3f11d77a5de76ec836c52333d45ac3742c7b27d3d83feba6ec978e223715c67
 - 이미지와 컨테이너는 각각 관리해줘야 함
 - 컨테이너 생성 시, docker 프로그램에서 이름이 자동 부여됨
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ docker create ubuntu:20.04
 92e9faed869db087280ad9f69a55f3eb7104ab495a022235e83e07f7bcc600b4
 ```
@@ -218,7 +218,7 @@ ubuntu@ip-172-31-42-165:~$ docker create ubuntu:20.04
 - 현재 실행중인 컨테이너 확인
 - ```docker ps```
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 ```
@@ -226,7 +226,7 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 - 실행중이지 않은 컨테이너까지 포함해서, 전체 컨테이너 확인
     - 맨 끝의 NAME에 기재된 이름이 컨테이너 이름임
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ docker ps -a
 CONTAINER ID   IMAGE          COMMAND   CREATED              STATUS    PORTS     NAMES
 92e9faed869d   ubuntu:20.04   "bash"    About a minute ago   Created             lucid_thompson 
@@ -246,17 +246,17 @@ CONTAINER ID   IMAGE          COMMAND   CREATED              STATUS    PORTS    
 
 - 실행중이지 않은 컨테이너 포함해서 생서된 컨테이너 ID 조회 
 
-    ```
+    ```bash
     docker ps -a -q
     ```
 
 #### 3. 컨테이너 삭제
 
-```
+```bash
 docker rm 삭제할 컨테이너 이름(컨테이너 리스트의 NAMES 의미)
 ```
 
-```
+```bash
 ubuntu@ip-172-31-42-165:~$ docker ps -a
 CONTAINER ID   IMAGE          COMMAND   CREATED              STATUS    PORTS     NAMES
 92e9faed869d   ubuntu:20.04   "bash"    About a minute ago   Created             lucid_thompson 
@@ -269,7 +269,7 @@ CONTAINER ID   IMAGE          COMMAND   CREATED              STATUS    PORTS    
 
     - --name 옵션
 
-        ```
+        ```bash
         docker create --name 내가원하는컨테이너이름 이미지 이름
         #예
         docker create --name helloubuntu ubuntu
@@ -280,7 +280,7 @@ CONTAINER ID   IMAGE          COMMAND   CREATED              STATUS    PORTS    
 
 #### 4. 컨테이너 실행
 
-```
+```bash
 docker start 컨테이너 이름
 ```
 
@@ -294,7 +294,7 @@ docker start 컨테이너 이름
         - 이미지 세부 정보를 알 수 있는 docker inspect 명령을 우선 이해하기
             - 다음과 같이 명령하면, cmd 항목에서 해당 컨테이너 실행 시, 실행하는 명령(응용프로그램)이 기재되어 있음  
 
-        ```
+        ```bash
         docker inspect ubuntu
         "Cmd" : [
         		"/bin/sh",
@@ -346,7 +346,7 @@ docker start 컨테이너 이름
     - pseudo tty를 만들어서 (-t 옵션) 해당 표준 입력을 pseudo tty에 연결해 놓음
     - 따라서, 키보드 입력을 pseudo tty를 통해, 컨테이너의 표준 입력으로 전달할 수 있도록 하는 것임
 
-    ```
+    ```bash
     ubuntu@ip-172-31-42-165:~$ docker run -it ubuntu:20.04
     root@e06d4b79919f:/#
     ```
@@ -358,7 +358,7 @@ docker start 컨테이너 이름
     - tty는 teletypewriter의 약자로, 리눅스 (유닉스 계열)에서는 콘솔 또는 터미널을 의미함
     - tty를 통해 리눅스에 키보드 입력을 전달할 수 있으며, 하나의 tty 이외에 다양한 터미널에서 접속을 지원하기 위해, 두번째 tty부터 가상(pseudo)이라는 말이 붙어서, pseudo tty라고 이야기함
 
-    ```
+    ```bash
     #컨테이너 실행 후, 해당 ubuntu 내로 들어가서, 터미널로 명령을 진행할 수 있음
     docker run -it ubuntu
     #컨테이너 이름을 원하는 이름으로 변경시
@@ -373,7 +373,7 @@ docker start 컨테이너 이름
 
 - 컨테이너 종료시 자동으로 컨테이너까지 삭제하는 옵션
 
-    ```
+    ```bash
     docker run -it --rm --name helloubuntu2 ubuntu
     #exit 명령으로 종료 시, 컨테이너도 자동 삭제
     docker ps -a #이전에 남겨져있던 컨테이너만 보여질 수 있고, helloubuntu2는 삭제되어 없음 
@@ -381,7 +381,7 @@ docker start 컨테이너 이름
 
 - 컨테이너를 백그라운드에서 실행하기 (실행중인 상태이지만, 터미널로 입력은 받지 않는 상태로 만들기)
 
-    ```
+    ```bash
     ubuntu@ip-172-31-42-165:~$ docker run -it -d --name helloubuntu3 ubuntu:20.04
     920649af6f73a6434075eb765a64546f4ab6162c733c099b817375e18c10f56b
     
@@ -392,7 +392,7 @@ docker start 컨테이너 이름
 
     - 필요할 때만 들어갈 수 있음
 
-        ```
+        ```bash
         docker attach helloubuntu3
         ```
 
@@ -404,7 +404,7 @@ docker start 컨테이너 이름
 
     - 이전에 백그라운드로 실행한 helloubuntu3를 중지하려면 해당 명령 실행
 
-    ```
+    ```bash
     docker stop helloubuntu3
     ```
 
@@ -420,19 +420,19 @@ docker start 컨테이너 이름
 
 - 각 docker마다 공식이름이 프로그램명과 동일한 경우가 일반적이지만, apache는 httpd 이름을 사용함
 
-    ```
+    ```bash
     docker search httpd
     ```
 
 - 너무 많으면 limit 로 검색하기
 
-    ```
+    ```bash
     docker search httpd --limit=5
     ```
 
 ##### 7-2. 이미지 다운로드 받고 바로 컨테이너로 만들어 실행시키기 (-p 옵션 이해하기)
 
-```
+```bash
 docker run httpd
 ```
 
@@ -440,7 +440,7 @@ docker run httpd
 
 - 처음에 다음과 같이 메시지가 나오는 것은 문제가 안됨. 자신의 PC에 해당 이미지가 없다는 의미로, 바로 이후에 해당 이미지 이름을 Docker hub에서 찾아 다운로드 진행
 
-    ```
+    ```bash
     Unable to find image 'httpd:latest' locally
     ```
 
@@ -450,7 +450,7 @@ docker run httpd
     - Ctrl + C로 강제 중단시킨 후, 다음과 같이 명령함 (관련 컨테이너는 중지 상태에 있으므로, 삭제해도 됨)
     - -d 옵션을 주어 background에서 해당 컨테이너를 실행하면됨. 보통 컨테이너는 background로 실행하는 것이 일반적 
 
-    ```
+    ```bash
     docker run -d --name apacheweb httpd
     ```
 
@@ -465,7 +465,7 @@ docker run httpd
     - 이를 지원해주는 옵션이 -p 옵션임
         - 따라서, 다음과 같이 작성하면, apacheweb2 컨테이너는 apache 웹서버 프로그램을 실행하고, 호스트 PC에 9999 포트로 접속하면, 자동으로 이를 해당 컨테이너의 80포트로 연결해주겠다라는 의미임
 
-    ````
+    ````bash
     docker run -d -p 9999:80 --name apacheweb2 httpd
     ````
 
@@ -488,7 +488,7 @@ docker run httpd
     - docker는 이미지를 기반으로 컨테이너를 만들기 때문에, 컨테이너 상에서 파일을 업데이트하거나, 생성할 경우, 컨테이너가 종료되면, 해당 파일은 없어지게 됨
         - 이를 보완하기 위해, 특정 폴더를 -v 옵션으로 교체 (공유 또는 바인딩이라는 용어를 더 많이 사용)하면, 해당 폴더는 호스트 PC상에 있기 때문에, 컨테이너가 종료되더라도, 파일을 유지할 수 있음
 
-    ```
+    ```bash
     #-v 옵션만 쓴다면 다음과 같이 작성 가능 
     docker run -v 호스트_PC의_절대경로:도커_컨테이너_절대경로 httpd 
     
@@ -506,7 +506,7 @@ docker run httpd
 
     - **정상적으로 volume이 연결되지 않아 컨테이너 접속하기**
 
-        - ```
+        - ```bash
             docker exec -it apacheweb /bin/bash
             ```
 
@@ -518,7 +518,7 @@ docker run httpd
 
 - 추후 docker가사용하는 저장매체 공간이 이슈가 될 수도 있으므로, 관련 명령 학습 
 
-    ```
+    ```bash
     docker system df 
     ```
 
@@ -530,7 +530,7 @@ docker run httpd
 
     - 통상 리눅스 사용시, 다양한 기능을 가진 ubuntu 등의 리눅스 패키지를 사용하지만, docker 컨테이너의 경우는 특정 응용프로그램 실행을 목적으로 하는 경우가 많기 때문에, 다양한 기능을 모두 포함할 필요가 없음 (동일한 기능을 한다면, 도커 이미지/컨테이너 사이즈가 작으면 작을 수록 좋음)
 
-- 대부분의 docker 이미지에 가장 기본이 되는 이미지는 ubuntu가 아니라, alpine인 경우가 ㅁ낳음
+- 대부분의 docker 이미지에 가장 기본이 되는 이미지는 ubuntu가 아니라, alpine인 경우가 많음
 
     - apline은
         - musl libc 라는 임베디드 리눅스(초경량 시스템을 위한 리눅스 시스템)를 위한 C/POSIX library (C 언어를 위한 기본 함수 및 POSIX라는 표준 규격에 맞춘 기본 함수를 포함한 라이브러리)와 
@@ -542,13 +542,13 @@ docker run httpd
 
 - httpd:alpine 실행해보기 
 
-    ```
+    ```bash
     docker run -d -p 9999:80 -v /home/ubuntu/2021_DEV_HTML:/usr/local/apache2/htdocs --name apacheweb3 httpd:alpine
     ```
 
 #### 9. docker 컨테이너 상태 확인
 
-```
+```bash
 docker container stats
 ```
 
@@ -556,7 +556,7 @@ docker container stats
 
 - 컨테이너 실행중일때만 다음 명령을 실행할 수 있음
 
-    ```
+    ```bash
     docker exec 옵션 컨테이너_ID 명령 인자
     ```
 
@@ -566,7 +566,7 @@ docker container stats
     - 다음과 같이 명령하면, /bin/sh 쉘 프로그램을 실행하면서, 터미널에 연결되므로, 컨테이너 안으로 들어갈 수 있음
         - /bin/bash가 아닌 /bin/sh를 쓴 이유는 /bin/bash는 alpine 리눅스에는 들어있지 않기 때문
 
-    ```
+    ```bash
     docker exec -it apacheweb2 /bin/sh
     ```
 
@@ -576,14 +576,14 @@ docker container stats
 
     - 여러 옵션은 "-dit"와 같이 한번에 붙여써도 되고, 다음과 같이 나눠써도 됨
 
-    ```
+    ```bash
     docker run -it -d --name myubuntu3 ubuntu
     docker run -dit --name myubuntu3 ubuntu
     ```
 
     - 다음과 같이 실행하면, 해당 컨테이너가 연결되어, 컨테이너 내에서 쉘 프로그램을 사용하여, 명령을 내릴 수 있음
 
-    ```
+    ```bash
     docker attach myubuntu3
     ```
 
@@ -591,32 +591,36 @@ docker container stats
 
         - docker exec -it [container_name] /bin/bash
 
-              : 외부에서 컨테이너 진입할 때 사용한다.
+          ```bash
+          : 외부에서 컨테이너 진입할 때 사용한다.
+          ```
 
         - docker attach [container_name 또는 container_ID]
-
-              : container 실행시 사용한다.
+        
+          ```bash
+          : container 실행시 사용한다.
+          ```
 
 #### 12. 모든 컨테이너 삭제하기 (+ 모든 docker 이미지 삭제)
 
 - 위와 같이 docker run 명령을 가장 많이 사용할 수 밖에 없는 상황이지만, docker run 사용시 항상 컨테이너가 별도로 생성됨.
 - 따라서, 모든 컨테이너를 한 번에 지우고 싶은 경우가 있으며, 다음과 같은 명령 조합으로 가능함
 
-```
+```bash
 docker stop $(docker ps -a -q) # 모든 컨테이너 중지
 docker rm $(docker ps -a -q)
 ```
 
 - 추가로 모든 docker 이미지 삭제 명령도 다음과 같음
 
-```
+```bash
 docker rmi $(docker images -q)
 docker rmi -f $(docker images -q)
 ```
 
 - 한번에 컨테이너 중지, 삭제, 이미지 삭제 하기 (각자 별도로 적어놓고, 한번에 실행하기)
 
-```
+```bash
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 docker rmi -f $(docker images -q)
@@ -627,7 +631,7 @@ docker rmi -f $(docker images -q)
     - 하지만, 다음 명령은 실행중인 container, 또는 실행중인 컨테이너의 image 등은 삭제하지 않음
         - 따라서 생각보다는 많이 사용되지 않음 
 
-    ```
+    ```bash
     docker container prune #정지된 컨테이너 삭제 
     docker image prune #실행중인 컨테이너 image 외의 이미지 삭제
     docker system prune #정지된 컨테이너, 실행중인 컨테이너 이미지 외의 이미지, 볼륨, 네트워크 삭제
