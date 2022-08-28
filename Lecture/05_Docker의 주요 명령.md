@@ -398,6 +398,239 @@ docker start 컨테이너 이름
 
         
 
-#### 6. 실행중인 컨테이너 중지하기
+#### 6. 실행중인 컨테이너 종료하기
 
-- 
+- 컨테이너 종료하기
+
+    - 이전에 백그라운드로 실행한 helloubuntu3를 중지하려면 해당 명령 실행
+
+    ```
+    docker stop helloubuntu3
+    ```
+
+    - 실행중인 컨테이너의 실행 상태를 멈추는 것은 docker pause이며, 이 때 멈춘 컨테이너를 다시 실행하는 명령은 docker unpause
+
+#### 7. 웹서버로 docker run 옵션 테스트
+
+- 웹서버는 크게 두가지 프로그램이 많이 사용됨
+    - apache
+    - nginx
+
+##### 7-1. apache 웹서버 공식 docker 찾기
+
+- 각 docker마다 공식이름이 프로그램명과 동일한 경우가 일반적이지만, apache는 httpd 이름을 사용함
+
+    ```
+    docker search httpd
+    ```
+
+- 너무 많으면 limit 로 검색하기
+
+    ```
+    docker search httpd --limit=5
+    ```
+
+##### 7-2. 이미지 다운로드 받고 바로 컨테이너로 만들어 실행시키기 (-p 옵션 이해하기)
+
+```
+docker run httpd
+```
+
+- 다음과 같이 명령하면 몇 가지 문제점 존재
+
+- 처음에 다음과 같이 메시지가 나오는 것은 문제가 안됨. 자신의 PC에 해당 이미지가 없다는 의미로, 바로 이후에 해당 이미지 이름을 Docker hub에서 찾아 다운로드 진행
+
+    ```
+    Unable to find image 'httpd:latest' locally
+    ```
+
+- 커멘드 라인에서 다음 명령을 할 수 없음(해당 컨테이너가 foreground로 실행되고 있기 때문)
+
+    - apache 웹서버가 실행된 상태로, 해당 프로그램 로그만 화면에 보여짐 (다른 터미널로 docker ps를 명령하면, 해당 컨테이너가 실행중임은 알 수 있음)
+    - Ctrl + C로 강제 중단시킨 후, 다음과 같이 명령함 (관련 컨테이너는 중지 상태에 있으므로, 삭제해도 됨)
+    - -d 옵션을 주어 background에서 해당 컨테이너를 실행하면됨. 보통 컨테이너는 background로 실행하는 것이 일반적 
+
+    ```
+    docker run -d --name apacheweb httpd
+    ```
+
+- 이번에는 해당 웹서버에 어떻게 접속해야할지 알 수 없음
+
+    - 포트 포워딩이 필요함
+    - docker를 실행한 PC를 Host PC(호스트 PC)라고 함.
+    - docker 컨테이너가 실행되면, 172.17.0.0/16 (서브넷이 255.255.0.0)인 Pribate IP가 할당 됨
+        - /16은 16비트까지 IP 할당이 된다는 의미로, 172.17..0~172.17.255.255까지 동일 네트워크 상에 IP 주소를 가질 수 있음을 의미함
+    - 호스트 PC IP에 특정 port로 access 시, 해당 port를 docker 컨테이너의 특정 Private IP의 특정 포트로 변환해줄 수 있음. 이를 NAPT(Network Address Port Traslation) 기술이라고 함  
+
+    - 이를 지원해주는 옵션이 -p 옵션임
+        - 따라서, 다음과 같이 작성하면, apacheweb2 컨테이너는 apache 웹서버 프로그램을 실행하고, 호스트 PC에 9999 포트로 접속하면, 자동으로 이를 해당 컨테이너의 80포트로 연결해주겠다라는 의미임
+
+    ````
+    docker run -d -p 9999:80 --name apacheweb2 httpd
+    ````
+
+    - 위와 같이 실행 후, EC2로 접속해 인바운드 규칙을 편집한다.
+
+        - EC2 -> 보안 -> 보안 그룹 접속 
+        - ![image-20220828224538699](05_Docker의 주요 명령.assets/image-20220828224538699.png)
+
+        - 인바운드 규칙에서 9999포트를 모든 IP에서 허용하면 정상적으로 접근 가능 
+        - ![image-20220828224613141](05_Docker의 주요 명령.assets/image-20220828224613141.png)
+
+##### 7.3 나만의 웹서비스 docker 만들기 (-v 옵션 이해하기)
+
+- 'it works'는 httpd 이미지의 apache 웹서버 기본 설정에 의해, /usr/local/apache2/htdocs 폴더에 있는 index.html에 적혀있는 html 태그임
+
+- 따라서, 해당 폴더를 내가 원하는 index.html 파일로 교체한다면 나의 웹페이지를 보여줄 수 있음
+
+- 호스트 PC 상에 나만의 index.html 파일이 있다면, -v 옵션을 사용해서, 호스트 PC의 특정 폴더를  docker 컨테이너의 특정 폴더로 교체할 수 있음
+
+    - docker는 이미지를 기반으로 컨테이너를 만들기 때문에, 컨테이너 상에서 파일을 업데이트하거나, 생성할 경우, 컨테이너가 종료되면, 해당 파일은 없어지게 됨
+        - 이를 보완하기 위해, 특정 폴더를 -v 옵션으로 교체 (공유 또는 바인딩이라는 용어를 더 많이 사용)하면, 해당 폴더는 호스트 PC상에 있기 때문에, 컨테이너가 종료되더라도, 파일을 유지할 수 있음
+
+    ```
+    #-v 옵션만 쓴다면 다음과 같이 작성 가능 
+    docker run -v 호스트_PC의_절대경로:도커_컨테이너_절대경로 httpd 
+    
+    #다른 옵션과 함께 사용한 실제 예(호스트 PC 경로에 한글이나 띄어쓰기가 있다면 따옴포료 묶어줘야함)
+    docker run -d -p 9999:80 -v /home/ubuntu/2021_DEV_HTML:/usr/local/apache2/htdocs --name apacheweb3 httpd
+    ```
+
+    - 컨테이너가 사라지더라도 이를 보존하기 위해 volume이라는 옵션을 사용하는 것으로, DB 유지를 위해 Volume 옵션은 중요하다 
+
+    - 폴더 옮기기 
+
+        - Filezilla 설치 
+        - 폴더 원하는 공간으로 옮기기 
+        - volume 경로 지정하기 
+
+    - **정상적으로 volume이 연결되지 않아 컨테이너 접속하기**
+
+        - ```
+            docker exec -it apacheweb /bin/bash
+            ```
+
+        - 접속 후 경로 확인 결과 오타였음 
+
+- 현업 팁 : docker 명령을 직접 내릴 때는 명령이 매우 길기 때문에, 보통 메모장 등에 명령셋들을 저장한 후, 복사/붙이기로 하나씩 실행하는 경우가 많음 
+
+#### 8. docker가 사용하고 있는 저장매체 현황 확인하기
+
+- 추후 docker가사용하는 저장매체 공간이 이슈가 될 수도 있으므로, 관련 명령 학습 
+
+    ```
+    docker system df 
+    ```
+
+##### docker와 alpine 
+
+- docker 이미지는 여러개의 이미지가 계층(layer)으로 쌓인 형태로 작성이 됨
+
+    - 예를 들면, C 라이브러리 이미지를 쌓고, 여기에 bash와 같은 쉘 프로그램 이미지를 쌓고, 여기에 응용 프로그램 이미지를 쌓는 방식
+
+    - 통상 리눅스 사용시, 다양한 기능을 가진 ubuntu 등의 리눅스 패키지를 사용하지만, docker 컨테이너의 경우는 특정 응용프로그램 실행을 목적으로 하는 경우가 많기 때문에, 다양한 기능을 모두 포함할 필요가 없음 (동일한 기능을 한다면, 도커 이미지/컨테이너 사이즈가 작으면 작을 수록 좋음)
+
+- 대부분의 docker 이미지에 가장 기본이 되는 이미지는 ubuntu가 아니라, alpine인 경우가 ㅁ낳음
+
+    - apline은
+        - musl libc 라는 임베디드 리눅스(초경량 시스템을 위한 리눅스 시스템)를 위한 C/POSIX library (C 언어를 위한 기본 함수 및 POSIX라는 표준 규격에 맞춘 기본 함수를 포함한 라이브러리)와 
+        - BusyBox는 운영체제 운영에 필요한 가장 기본이 되는 유틸리티(시스템 프로그램)만 모아놓은 리눅스 패키지 
+
+##### httpd와 alpine
+
+- httpd도 태그 중에 alpine이라는 태그가 있음 
+
+- httpd:alpine 실행해보기 
+
+    ```
+    docker run -d -p 9999:80 -v /home/ubuntu/2021_DEV_HTML:/usr/local/apache2/htdocs --name apacheweb3 httpd:alpine
+    ```
+
+#### 9. docker 컨테이너 상태 확인
+
+```
+docker container stats
+```
+
+#### 10. 실행중인 컨테이너에 명령 실행하기
+
+- 컨테이너 실행중일때만 다음 명령을 실행할 수 있음
+
+    ```
+    docker exec 옵션 컨테이너_ID 명령 인자
+    ```
+
+- 테스트
+
+    - -it: docker run에서 설명한 표준입력(-i), 터미널(-t) 옵션이며, docker exec에서도 사용 가능
+    - 다음과 같이 명령하면, /bin/sh 쉘 프로그램을 실행하면서, 터미널에 연결되므로, 컨테이너 안으로 들어갈 수 있음
+        - /bin/bash가 아닌 /bin/sh를 쓴 이유는 /bin/bash는 alpine 리눅스에는 들어있지 않기 때문
+
+    ```
+    docker exec -it apacheweb2 /bin/sh
+    ```
+
+#### 11. 실행중인 컨테이너에 연결하기
+
+- docker run으로 다음과 같이 터미널을 연결해놓은 상태로, 백그라운드로 실행시
+
+    - 여러 옵션은 "-dit"와 같이 한번에 붙여써도 되고, 다음과 같이 나눠써도 됨
+
+    ```
+    docker run -it -d --name myubuntu3 ubuntu
+    docker run -dit --name myubuntu3 ubuntu
+    ```
+
+    - 다음과 같이 실행하면, 해당 컨테이너가 연결되어, 컨테이너 내에서 쉘 프로그램을 사용하여, 명령을 내릴 수 있음
+
+    ```
+    docker attach myubuntu3
+    ```
+
+    - exec 명령은 해당 컨테이너에 신규 명령을 실행하는 명령이고, attach는 컨테이너에 연결하는 명령임
+
+        - docker exec -it [container_name] /bin/bash
+
+              : 외부에서 컨테이너 진입할 때 사용한다.
+
+        - docker attach [container_name 또는 container_ID]
+
+              : container 실행시 사용한다.
+
+#### 12. 모든 컨테이너 삭제하기 (+ 모든 docker 이미지 삭제)
+
+- 위와 같이 docker run 명령을 가장 많이 사용할 수 밖에 없는 상황이지만, docker run 사용시 항상 컨테이너가 별도로 생성됨.
+- 따라서, 모든 컨테이너를 한 번에 지우고 싶은 경우가 있으며, 다음과 같은 명령 조합으로 가능함
+
+```
+docker stop $(docker ps -a -q) # 모든 컨테이너 중지
+docker rm $(docker ps -a -q)
+```
+
+- 추가로 모든 docker 이미지 삭제 명령도 다음과 같음
+
+```
+docker rmi $(docker images -q)
+docker rmi -f $(docker images -q)
+```
+
+- 한번에 컨테이너 중지, 삭제, 이미지 삭제 하기 (각자 별도로 적어놓고, 한번에 실행하기)
+
+```
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker rmi -f $(docker images -q)
+```
+
+- 별도로 다음 명령도 사용 가능
+
+    - 하지만, 다음 명령은 실행중인 container, 또는 실행중인 컨테이너의 image 등은 삭제하지 않음
+        - 따라서 생각보다는 많이 사용되지 않음 
+
+    ```
+    docker container prune #정지된 컨테이너 삭제 
+    docker image prune #실행중인 컨테이너 image 외의 이미지 삭제
+    docker system prune #정지된 컨테이너, 실행중인 컨테이너 이미지 외의 이미지, 볼륨, 네트워크 삭제
+    ```
+
+    
