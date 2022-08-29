@@ -1,0 +1,6 @@
+services:
+  db:
+    image: mysql
+    restart: always
+    volumes:
+      - ./mysqldata:/var/lib/mysql
