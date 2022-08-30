@@ -302,7 +302,7 @@ services:
 
 
 
-## Docker Compose 실행/중지하기
+### Docker Compose 실행/중지하기
 
 ```
 version : '3'
@@ -394,4 +394,250 @@ docker-compose down
     $ docker ps 
     ```
 
+
+
+
+## docker-compose.yml로 이해하는 Docker Compose 사용법 2 
+
+- 기존에 작성한 docker-compose.yml에 컨테이너를 추가하며, 추가 문법 이해하기
+
+```yaml
+version: "3"
+
+services:
+  app:
+    build:
+      context: ./01_FLASK_DOCKER
+      dockerfile: Dockerfile
+    links:
+      - "db:mysqldb"
+    ports:
+      - "80:8080"
+    container_name: appcontainer
+    depends_on:
+    - db
     
+  db:
+    image: mysql:5.7
+    restart: always
+
+    volumes:
+      - ./mysqldata:/var/lib/mysql 
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=dbname
+    ports:
+      - "3306:3306"
+    container_name: dbcontainer
+```
+
+### build
+
+- 이미지를 Dockerfile 기반으로 작성시 사용
+    - context: Dockerfile이 있는 디렉토리
+    - dockerfile: Dockerfile명 
+
+- Dockerfile을 별도로 만들고, 그 파일로 이미지를 만들게 하는 옵션
+- context는 어느 폴더인지 명시해주는 것 
+
+
+
+### links
+
+- 컨테이너 내부에서, 다른 컨테이너를 접속하고 싶을 때 사용
+- 다음 YAML 코드에서, db 컨테이너를 app 컨테이너에서 사용하고 싶을 때 ,
+
+```
+version: "3"
+
+services:
+  app:
+    build:
+      context: ./01_FLASK_DOCKER
+      dockerfile: Dockerfile
+    links:
+      - "db:mysqldb"
+    ports:
+      - "80:8080"
+    container_name: appcontainer
+    depends_on:
+    - db
+    
+  db:
+    image: mysql:5.7
+```
+
+- 다음과 같이 작성하면, db라는 이름으로 컨테이너 접속 가능
+
+```
+version: "3"
+
+services:
+  app:
+    build:
+      context: ./01_FLASK_DOCKER
+      dockerfile: Dockerfile
+    links:
+      - "db:mysqldb"
+    ports:
+      - "80:8080"
+    container_name: appcontainer
+    depends_on:
+    - db
+    
+  db:
+    image: mysql:5.7
+```
+
+- 다음과 같이 작성하면, mysqldb 또는 db 이름으로(둘 다 가능) 컨테이너 접속 가능
+    - 역시 aa:bb와 같은 형태는 YAML 문법에서 날짜로 인지하기 때문에, 쌍따옴표로 작성해야 함 
+
+```
+version: "3"
+
+services:
+  app:
+    build:
+      context: ./01_FLASK_DOCKER
+      dockerfile: Dockerfile
+    links:
+      - "db:mysqldb"
+    ports:
+      - "80:8080"
+    container_name: appcontainer
+    depends_on:
+    - db
+    
+  db:
+    image: mysql:5.7
+```
+
+### depends_on
+
+- app 컨테이너에서는 mysqldb가 있어야 db를 사용할 수 있고, 서버가 정상적으로 실행될 수 있다. 하지만, 어느 컨테이너가 먼저 빌드될지 모르는 상황.
+- depends_on 옵션을 주면, 해당 리스트에 있는 컨테이너부터 생성 후 다음 컨테이너를 생성한다. 
+
+- 여러 컨테이너를 Docker Compose로 실행할 경우, 각 컨테이너가 실행을 시작하는 시점이 미묘하게 다를 수 있다.
+- 따라서, 특정 컨테이너가 시작하자마자, 바로 다른 컨테이너를 접속하도록 코드를 작성하면, 시점에 따라 접속 불가 에러가 발생할 수 있다.
+- 이를 위한 옵션으로 depends_on 옵션이 있지만, 해당 옵션도 컨테이너 실행 순서만 제어하고, 컨테이너가 ready 상태가 될 때까지를 명확히 제어하는 것은 아니므로 depends_on 옵션이 기대한대로 동작하지 않을 수 있다.
+- 예를들어, 위와 같이 작성하면, db 컨테이너가 app 컨테이너보다 먼저 실행이 되지만, ready 사이태는 어느 컨테이너가 먼저 될지 알 수 없음 
+    - 각 컨테이너 설정마다, 실제 프로세스가 실행되는 시점은 다를 수 있기 때문
+
+### Flask Mysql test
+
+#### 테스트 환경 셋업
+
+- Flask file
+
+```python
+from flask import Flask
+import pymysql
+
+app = Flask(__name__)
+
+MYSQL_HOST = 'mysqldb'
+MYSQL_PORT = 3306
+
+def conn_mysqldb():
+    MYSQL_CONN = pymysql.connect(
+        host=MYSQL_HOST,
+        port=MYSQL_PORT,
+        user='root',
+        passwd='password',
+        db='dbname',
+        charset='utf8'
+    )
+    return MYSQL_CONN
+
+
+@app.route('/')
+def hello_world():
+    mysql_db = conn_mysqldb()
+    db_cursor = mysql_db.cursor()
+    sql = "SHOW TABLES"
+    # print (sql)
+    db_cursor.execute(sql)
+    user = db_cursor.fetchone()
+    print (user, MYSQL_HOST)
+    return 'SUCCESS'
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port='8080')
+
+```
+
+- Flask Dockerfile
+    - 다음과 같이 flask Dockerfile 작성
+        - 아나콘다 도커로 continumio/miniconda 이미지 많이 사용
+            - 아나콘다 풀패키지에 포함된 프로그램이 많기 때문에, 기본 패키지만설치
+            - flask, pymysql을 위해 필요한 라이브러리 설치 
+
+```dockerfile
+#아나콘다 공식 이미지 
+FROM continuumio/miniconda 
+#현재폴더에 있는 코드를 내부에 /app이라는 폴더를 만들어 거기로 옮김 
+COPY ./ /app
+
+#/app으로 이동 
+WORKDIR /app
+
+
+RUN pip install flask pymysql cryptography
+#flask 서버 실행 
+CMD ["python", "main.py"]
+```
+
+- Docker Compose 실행
+
+    ```
+    docker-compose up -d
+    ```
+
+    - EC2에서 80포트 열어주기 
+
+    - 크롬 브라우저를 통해, localhost:8080으로 접속이 가능하면 성공
+    - main.py에서 3306포트와 mysqldb 호스트 이름을 사용한 것을 확인할 수 있음 
+
+### dockerignore
+
+- Dockerfile 작성시 COPY ./ /app 구문은 현재 폴더에 있는 모든 파일을 컨테이너 내의 /app 폴더로 복사
+
+- 현재 폴더에는 Dockerfile도 있으며, 작업 환경에 따라서 예상치 못한 파일들이 있을 수 있음  예(vscode)
+
+- COPY시 특정 파일/폴더는 제외하도록 현재 폴더에 .dockerignore 파일 작성 가능
+
+    - gitignore와 동일한 방식
+
+- .dockerignore 파일 포맷 
+
+    ```
+    #주석 
+    */flask*
+    */*/flask*
+    flask?
+    flask*
+    ```
+
+    - `*/flask*`: 현재 폴더의 어떤 하위 폴더든 (이것이 */가 의미하는 바) flask로 시작하는 폴더나 파일명은 제외
+
+        - 예 : any/flask/kkk.txt, any/flask.txt
+
+    - `*/*/flask*`: 현재 폴더의 하위 폴더의 하위폴더에서, flask로 시작하는 폴더나 파일명은 제외
+
+        - 예: any/any/flask/kkk.txt, any/any/flask.txt
+        - 하위 폴더의 깊이에 관계 없이 쓰려면, `**/flask*`와 같이 두개의 *로 작성하면 됨
+
+    - `flask?`와 `flask*`: flask?의 물음표(?)는 한글자를 의미하므로, flaska나 flaskb와 같은 폴더 또는 파일을 의미하고, flask*는 flask로 시작하는 모든 폴더나 파일을 의미
+
+    - 느낌표(!)를 쓰면,해당 조건은 **제외조건**에서 제외함을 의미함
+
+        - 예 : 다음 예는 현재 폴더의 모든 .txt로 끝나는 파일을 제외하되, 단 flask.txt는 제외하지 말라는 뜻 
+
+        ```
+        *.txt
+        !flask.txt
+        ```
+
+    
+
