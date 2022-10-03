@@ -641,3 +641,28 @@ CMD ["python", "main.py"]
 
     
 
+#### docker-compose logs
+
+- 각 컨테이너의 모든 로그(출력결과) 확인
+
+    ```
+    docker-compose config
+    ```
+
+#### docker-compose config
+
+- 실행 중인 Docker Compose의 docker-compose.yml 설정 확인
+
+    ```
+    docker-compose config
+    ```
+
+#### docker-compose exec 컨테이너 이름 명령
+
+- 실행중인 컨테이너에 명령을 실행 
+
+    ```
+    docker-compose exec app /bin/bash
+    ```
+
+    
