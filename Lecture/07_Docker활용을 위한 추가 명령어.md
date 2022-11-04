@@ -193,3 +193,37 @@ C /run/apache2/apache2.pid
 ### docker logs 
 
 - 컨테이너의 출력결과(STDOUT)를 확인
+
+### docker volume
+
+- 특정 호스트 PC와 연결하지 않고, 해당 볼륨을 컨테이너 삭제시에도 유지만 하고 싶을 경우, 
+- 다음과 같이 volume 설정을 docker-compose.yml 파일 내에서 해줘야 함 
+
+```
+이름1: 컨테이너내부경로 1
+이름2: 컨테이너내부경로2
+
+volumes:
+	이름1:
+	이름2:
+```
+
+- 볼륨 조회 도커 명령
+
+```
+docekr volume ls # 도커 볼륨 조회
+docker volume inspect 볼륨이름 # 도커 볼륨 상세 정보 조히
+```
+
+- 볼륨 삭제 도커 명령
+
+```
+docker volume rm 볼륨이름
+```
+
+- 쓰지 않는 볼륨 삭제 도커 명령
+
+```
+docker volume prune
+```
+
